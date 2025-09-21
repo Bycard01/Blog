@@ -1,18 +1,21 @@
-name: Generate Sitemap
+name: Auto Generate Sitemap
 
 on:
   push:
     branches:
-      - main
+      - main  # 每次 push 到 main 分支時自動執行
+  workflow_dispatch:  # 允許手動觸發
 
 jobs:
   generate-sitemap:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ 取得程式碼
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
+      # 2️⃣ 生成 sitemap
       - name: Generate sitemap
         uses: cicirello/generate-sitemap@v1
         with:
@@ -21,3 +24,16 @@ jobs:
           include-pdf: false
           include-html: true
           exclude: 'README.md'
+
+      # 3️⃣ 配置 git
+      - name: Configure Git
+        run: |
+          git config --local user.name "bycard01"
+          git config --local user.email "your-email@example.com"
+
+      # 4️⃣ 提交並推送 sitemap
+      - name: Commit and push sitemap
+        run: |
+          git add sitemap.xml
+          git diff --quiet && echo "No changes to commit" || git commit -m "Auto-generate sitemap"
+          git push
