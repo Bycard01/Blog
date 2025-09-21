@@ -3,8 +3,8 @@ name: Auto Generate Sitemap
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:  # 允許手動觸發
+      - main   # 每次 push 到 main 分支自動執行
+  workflow_dispatch: # 允許手動觸發
 
 jobs:
   generate-sitemap:
@@ -28,15 +28,14 @@ jobs:
       # 3️⃣ 配置 Git
       - name: Configure Git
         run: |
-          git config --local user.name "bycard01"
-          git config --local user.email "your-email@example.com"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 4️⃣ 使用 PAT 提交並推送 sitemap
+      # 4️⃣ 提交並推送 sitemap (使用自動 GITHUB_TOKEN)
       - name: Commit and push sitemap
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/Bycard01/blog.git
           git add sitemap.xml
           git diff --quiet && echo "No changes to commit" || git commit -m "Auto-generate sitemap"
           git push origin main
