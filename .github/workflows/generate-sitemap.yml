@@ -1,0 +1,23 @@
+name: Generate Sitemap
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-sitemap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Generate sitemap
+        uses: cicirello/generate-sitemap@v1
+        with:
+          sitemap-type: 'xml'
+          base-url: 'https://bycard01.github.io/blog/'
+          include-pdf: false
+          include-html: true
+          exclude: 'README.md'
