@@ -4,32 +4,39 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch:  # 允許手動觸發
 
 jobs:
   generate-sitemap:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ 取得程式碼
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ 生成 sitemap
       - name: Generate sitemap
         uses: cicirello/generate-sitemap@v1
         with:
-          sitemap-format: 'xml'           # 原 sitemap-type
-          base-url-path: 'https://bycard01.github.io/blog/'  # 原 base-url
+          sitemap-format: 'xml'           
+          base-url-path: 'https://bycard01.github.io/blog/'  
           include-html: true
           include-pdf: false
-          exclude-paths: 'README.md'     # 原 exclude
+          exclude-paths: 'README.md'     
 
+      # 3️⃣ 配置 Git
       - name: Configure Git
         run: |
           git config --local user.name "bycard01"
           git config --local user.email "your-email@example.com"
 
+      # 4️⃣ 使用 PAT 提交並推送 sitemap
       - name: Commit and push sitemap
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/Bycard01/blog.git
           git add sitemap.xml
           git diff --quiet && echo "No changes to commit" || git commit -m "Auto-generate sitemap"
-          git push
+          git push origin main
